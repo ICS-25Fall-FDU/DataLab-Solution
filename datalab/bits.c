@@ -247,10 +247,13 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int swapNibblePairs(int x) {
-  int lowMask = 0x0F0F0F0F;
-  int lowPart = (x & lowMask) << 4;
-  int highPart = ((x >> 4) & lowMask);
-  return lowPart | highPart;
+  int mask = 0x0F;                 // 合法常量
+  mask = mask | (mask << 8);       // 得到 0x0F0F
+  mask = mask | (mask << 16);      // 得到 0x0F0F0F0F
+  // int lowPart = (x & mask) << 4;   // 取低 nibble 并左移
+  // int highPart = (x >> 4) & mask;  // 取高 nibble 并右移
+  // return lowPart | highPart;       // 合并
+  return ((x & mask) << 4) | ((x >> 4) & mask);
 }
 
 // P9
