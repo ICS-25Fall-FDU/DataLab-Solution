@@ -427,28 +427,28 @@ unsigned float_half(unsigned f) {
  *   Rating: 7
  */
 unsigned float_i2f(int x) {
- int fx, exp, nx, wx;
- unsigned ans, sign, tag;
- if (!x) return x;
- if (x == 1 << 31) return 0xcf << 24; 
- sign = x >> 31;
- wx = fx = (x ^ sign) + (~sign) + 1;
- exp = 0;
- while (wx){
-  exp++;
-  wx >>= 1;
- }
- exp--;
- ans = (x & (1 << 31)) | ((exp + 127) << 23);
- if (exp <= 23) ans = ans | (fx & (~(1 << exp))) << (23 - exp);
- else{
-  nx = fx >> (exp - 24);
-  wx = (1 << (exp - 24)) - 1;
-  if (fx & wx) tag = (nx & 1) == 1;  // 四舍六入
-  else tag = (nx & 3) == 3; // 五成双
-  ans = (ans | (((nx >> 1) & (~(1 << 23))))) + tag; 
- }
- return ans;
+  int fx, exp, nx, wx;
+  unsigned ans, sign, tag;
+  if (!x) return x;
+  if (x == 1 << 31) return 0xcf << 24; 
+    sign = x >> 31;
+    wx = fx = (x ^ sign) + (~sign) + 1;
+    exp = 0;
+    while (wx){
+    exp++;
+    wx >>= 1;
+  }
+  exp--;
+  ans = (x & (1 << 31)) | ((exp + 127) << 23);
+  if (exp <= 23) ans = ans | (fx & (~(1 << exp))) << (23 - exp);
+  else{
+    nx = fx >> (exp - 24);
+    wx = (1 << (exp - 24)) - 1;
+    if (fx & wx) tag = (nx & 1) == 1;
+    else tag = (nx & 3) == 3; // 五成双
+    ans = (ans | (((nx >> 1) & (~(1 << 23))))) + tag; 
+  }
+  return ans;
 }
 
 
