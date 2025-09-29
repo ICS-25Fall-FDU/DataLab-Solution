@@ -26,40 +26,40 @@ jobs:
         comparison-method: regex
         timeout: 10
         max-score: 100
-    - name: tmax
-      id: tmax
+    - name: signMask
+      id: signmask
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: tmax
+        test-name: signMask
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f tmax
+        command: cd datalab && ./btest -f signMask
         input: ''
         expected-output: 'Total points: 1/1'
         comparison-method: contains
         timeout: 10
         max-score: 1
-    - name: bitNor
-      id: bitnor
+    - name: bitXor
+      id: bitxor
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: bitNor
+        test-name: bitXor
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f bitNor
+        command: cd datalab && ./btest -f bitXor
         input: ''
         expected-output: 'Total points: 2/2'
         comparison-method: contains
         timeout: 10
         max-score: 2
-    - name: getByte
-      id: getbyte
+    - name: clearByte
+      id: clearbyte
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: getByte
+        test-name: clearByte
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f getByte
+        command: cd datalab && ./btest -f clearByte
         input: ''
         expected-output: 'Total points: 2/2'
         comparison-method: contains
@@ -78,27 +78,27 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 3
-    - name: absVal
-      id: absval
+    - name: negativePart
+      id: negativepart
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: absVal
+        test-name: negativePart
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f absVal
+        command: cd datalab && ./btest -f negativePart
         input: ''
         expected-output: 'Total points: 3/3'
         comparison-method: contains
         timeout: 10
         max-score: 3
-    - name: isLessOrEqual
-      id: islessorequal
+    - name: isLargerOrEqual
+      id: islargerorequal
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: isLessOrEqual
+        test-name: isLargerOrEqual
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f isLessOrEqual
+        command: cd datalab && ./btest -f isLargerOrEqual
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
@@ -117,40 +117,40 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 4
-    - name: swapOddandEven
-      id: swapoddandeven
+    - name: swapNibblePairs
+      id: swapnibblepairs
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: swapOddandEven
+        test-name: swapNibblePairs
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f swapOddandEven
+        command: cd datalab && ./btest -f swapNibblePairs
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
         timeout: 10
         max-score: 4
-    - name: secondLowBit
-      id: secondlowbit
+    - name: secondLowestZeroBit
+      id: secondlowestzerobit
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: secondLowBit
+        test-name: secondLowestZeroBit
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f secondLowBit
+        command: cd datalab && ./btest -f secondLowestZeroBit
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
         timeout: 10
         max-score: 4
-    - name: rotateNBits
-      id: rotatenbits
+    - name: rotateRightBits
+      id: rotaterightbits
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: rotateNBits
+        test-name: rotateRightBits
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f rotateNBits
+        command: cd datalab && ./btest -f rotateRightBits
         input: ''
         expected-output: 'Total points: 5/5'
         comparison-method: contains
@@ -182,14 +182,14 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 7
-    - name: mul3
-      id: mul3
+    - name: mul5Sat
+      id: mul5sat
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: mul3
+        test-name: mul5Sat
         setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
           && make all
-        command: cd datalab && ./btest -f mul3
+        command: cd datalab && ./btest -f mul5Sat
         input: ''
         expected-output: 'Total points: 7/7'
         comparison-method: contains
@@ -264,23 +264,23 @@ jobs:
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
         OPERATOR-CHECK_RESULTS: "${{steps.operator-check.outputs.result}}"
-        TMAX_RESULTS: "${{steps.tmax.outputs.result}}"
-        BITNOR_RESULTS: "${{steps.bitnor.outputs.result}}"
-        GETBYTE_RESULTS: "${{steps.getbyte.outputs.result}}"
+        SIGNMASK_RESULTS: "${{steps.signmask.outputs.result}}"
+        BITXOR_RESULTS: "${{steps.bitxor.outputs.result}}"
+        CLEARBYTE_RESULTS: "${{steps.clearbyte.outputs.result}}"
         ROUNDUP_RESULTS: "${{steps.roundup.outputs.result}}"
-        ABSVAL_RESULTS: "${{steps.absval.outputs.result}}"
-        ISLESSOREQUAL_RESULTS: "${{steps.islessorequal.outputs.result}}"
+        NEGATIVEPART_RESULTS: "${{steps.negativepart.outputs.result}}"
+        ISLARGEROREQUAL_RESULTS: "${{steps.islargerorequal.outputs.result}}"
         LOGICALSHIFT_RESULTS: "${{steps.logicalshift.outputs.result}}"
-        SWAPODDANDEVEN_RESULTS: "${{steps.swapoddandeven.outputs.result}}"
-        SECONDLOWBIT_RESULTS: "${{steps.secondlowbit.outputs.result}}"
-        ROTATENBITS_RESULTS: "${{steps.rotatenbits.outputs.result}}"
+        SWAPNIBBLEPAIRS_RESULTS: "${{steps.swapnibblepairs.outputs.result}}"
+        SECONDLOWESTZEROBIT_RESULTS: "${{steps.secondlowestzerobit.outputs.result}}"
+        ROTATERIGHTBITS_RESULTS: "${{steps.rotaterightbits.outputs.result}}"
         FRACTIONS_RESULTS: "${{steps.fractions.outputs.result}}"
         OVERFLOWCALC_RESULTS: "${{steps.overflowcalc.outputs.result}}"
-        MUL3_RESULTS: "${{steps.mul3.outputs.result}}"
+        MUL5SAT_RESULTS: "${{steps.mul5sat.outputs.result}}"
         FLOAT_ABS_RESULTS: "${{steps.float_abs.outputs.result}}"
         FLOAT_HALF_RESULTS: "${{steps.float_half.outputs.result}}"
         FLOAT_I2F_RESULTS: "${{steps.float_i2f.outputs.result}}"
         ODDPARITY_RESULTS: "${{steps.oddparity.outputs.result}}"
         BITCOUNT_RESULTS: "${{steps.bitcount.outputs.result}}"
       with:
-        runners: operator-check,tmax,bitnor,getbyte,roundup,absval,islessorequal,logicalshift,swapoddandeven,secondlowbit,rotatenbits,fractions,overflowcalc,mul3,float_abs,float_half,float_i2f,oddparity,bitcount
+        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_abs,float_half,float_i2f,oddparity,bitcount
