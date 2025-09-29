@@ -19,7 +19,7 @@ test_rec test_set[] = {
  {"bitCount", (funct_t) bitCount, (funct_t) test_bitCount, 1, "! ~ & ^ | + << >>", 40, 2,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"absVal", (funct_t) absVal, (funct_t) test_absVal, 1,
+ {"negativePart", (funct_t) negativePart, (funct_t) test_negativePart, 1,
     "! ~ & ^ | + << >>", 6, 3,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
@@ -27,22 +27,22 @@ test_rec test_set[] = {
     "! ~ & ^ | + << >>", 20, 4,
   {{TMin, TMax},{0,31},{TMin,TMax}}},
 
- {"isLessOrEqual", (funct_t) isLessOrEqual, (funct_t) test_isLessOrEqual, 2,
+ {"isLargerOrEqual", (funct_t) isLargerOrEqual, (funct_t) test_isLargerOrEqual, 2,
     "! ~ & ^ | + << >>", 24, 4,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"getByte", (funct_t) getByte, (funct_t) test_getByte, 2,
+ {"clearByte", (funct_t) clearByte, (funct_t) test_clearByte, 2,
     "! ~ & ^ | + << >>", 6, 2,
   {{TMin, TMax},{0,3},{TMin,TMax}}},
 
  {"roundUp", (funct_t) roundUp, (funct_t) test_roundUp, 1, "! ~ & ^ | + << >>", 8, 3,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"swapOddandEven", (funct_t) swapOddandEven, (funct_t) test_swapOddandEven, 1,
+ {"swapNibblePairs", (funct_t) swapNibblePairs, (funct_t) test_swapNibblePairs, 1,
     "! ~ & ^ | + << >>", 18, 4,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"secondLowBit", (funct_t) secondLowBit, (funct_t) test_secondLowBit, 1,
+ {"secondLowestZeroBit", (funct_t) secondLowestZeroBit, (funct_t) test_secondLowestZeroBit, 1,
     "! ~ & ^ | + << >>", 8, 4,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 

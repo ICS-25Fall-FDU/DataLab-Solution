@@ -144,7 +144,7 @@ NOTES:
  *   Rating: 1
  */
 int signMask(void) {
-  return 1;
+  return 1 << 31;
 }
 
 // P2
@@ -156,20 +156,24 @@ int signMask(void) {
  *   Rating: 2
  */
 int bitXor(int x, int y) {
-	return 2;
+	int notBothOne = ~(x & y);
+	int notBothZero = ~((~x) & (~y));
+	return notBothOne & notBothZero;
 }
 
 // P3
 /*
- * getByte - return the nth byte of x
+ * clearByte - return x with the nth byte cleared to 0
  *   You can assume 0 <= n <= 3
- *   Example: getByte(0x01020304, 2) = 0x2
+ *   Example: clearByte(0x01020304, 2) = 0x01000304
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 6
  *   Rating: 2
  */
-int getByte(int x,int n) {
-  return 3;
+int clearByte(int x,int n) {
+  int shift = n << 3;
+  int mask = ~(0xFF << shift);
+  return x & mask;
 }
 
 // P4
@@ -181,32 +185,43 @@ int getByte(int x,int n) {
  *   Rating: 3
  */
 int roundUp(int x) {
-  return 4;
+  int mask = 0xFF;
+  int hasRemainder = !!(x & mask);
+  int base = x & ~mask;
+  return base + (hasRemainder << 8);
 }
 
 // P5
 /*
- * absVal - return the absolute value of x
- *   Examples: absVal(-10) = 10
- *			       absVal(5) = 5
+ * negativePart - return -x if x < 0, otherwise return 0
+ *   Examples: negativePart(-10) = 10, negativePart(5) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 6
  *   Rating: 3
  */
-int absVal(int x){
-  return 5;
+int negativePart(int x){
+  int sign = x >> 31;
+  int negX = (~x + 1);
+  return negX & sign;
 }
 
 // P6
 /* 
- * isLessOrEqual - if x <= y  then return 1, else return 0 
- *   Example: isLessOrEqual(4,5) = 1.
+ * isLargerOrEqual - return 1 if x >= y, else return 0 
+ *   Example: isLargerOrEqual(5,4) = 1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 4
  */
-int isLessOrEqual(int x, int y) {
-  return 6;
+int isLargerOrEqual(int x, int y) {
+  int signX = (x >> 31) & 1;
+  int signY = (y >> 31) & 1;
+  int signDiff = signX ^ signY;
+  int diff = x + (~y + 1);
+  int diffSign = (diff >> 31) & 1;
+  int sameSignCmp = !diffSign;
+  int sameSign = !signDiff;
+  return (signDiff & signY) | (sameSign & sameSignCmp);
 }
 
 // P7
@@ -219,33 +234,38 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int logicalShift(int x, int n) {
-  return 7;
+  int mask=((0x1<<(32+~n))+~0)|(0x1<<(32+~n));
+  return (x>>n)&mask;
 }
 
 // P8
 /*
- * swapOddandEven - swap the odd bits and even bits in x
- *   Examples: swapOddandEven(0xAA) = 0x55
+ * swapNibblePairs - swap the low and high 4 bits within each byte of x
+ *   Examples: swapNibblePairs(0xAB) = 0xBA
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 4
  */
-int swapOddandEven(int x) {
-  return 8;
+int swapNibblePairs(int x) {
+  int lowMask = 0x0F0F0F0F;
+  int lowPart = (x & lowMask) << 4;
+  int highPart = ((x >> 4) & lowMask);
+  return lowPart | highPart;
 }
 
 // P9
 /*
- * secondLowBit - return a mask that marks the position of the second least significant 1 bit
- *   Examples: secondLowBit(0x00000110) = 0x00000100
- *			       secondLowBit(0xFEDC1a80) = 0x00000200
- *             secondLowBit(0)  = 0
+ * secondLowestZeroBit - return a mask that marks the position of the second least significant 0 bit
+ *   Examples: secondLowestZeroBit(0xFFFFFFFD) = 0x4, secondLowestZeroBit(0x7FFFFFFF) = 0
+ *             secondLowestZeroBit(-1) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
  *   Rating: 4
  */
-int secondLowBit(int x) {
-  return 9;
+int secondLowestZeroBit(int x) {
+  int firstZero = (~x) & (x + 1);
+  int filled = x | firstZero;
+  return (~filled) & (filled + 1);
 }
 
 // P10

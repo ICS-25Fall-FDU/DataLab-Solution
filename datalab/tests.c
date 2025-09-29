@@ -29,14 +29,15 @@ int test_bitNand(int x, int y){
   return ~(x&y);
 }
 
-int test_getByte(int x,int y){
+int test_clearByte(int x,int y){
   union tests
   {
     int a;
-    char b[4];
+    unsigned char b[4];
   }t;
   t.a = x;
-  return 0xff&(int)t.b[y];
+  t.b[y] = 0;
+  return t.a;
 }
 
 int test_roundUp(int x){
@@ -50,14 +51,14 @@ int test_roundUp(int x){
   }
 }
 
-int test_swapOddandEven(int x){
+int test_swapNibblePairs(int x){
     int result = 0;
-    for (int i = 0; i < 32; i += 2) {
-        unsigned int evenBit = (x >> i) & 1;
-        unsigned int oddBit = (x >> (i + 1)) & 1;
-        
-        result |= (evenBit << (i + 1));
-        result |= (oddBit << i);
+    for (int i = 0; i < 32; i += 8) {
+        int byte = (x >> i) & 0xFF;
+        int lowNibble = byte & 0x0F;
+        int highNibble = (byte >> 4) & 0x0F;
+        int swapped = (lowNibble << 4) | highNibble;
+        result |= (swapped << i);
     }
     return result;
 }
@@ -72,9 +73,16 @@ int test_rotateNBits(int x, int n){
 int test_fractions(int x){
   return x*7/16;
 }
-int test_secondLowBit(int x){
-  int y=x-(x&-x);
-  return y&(-y);
+int test_secondLowestZeroBit(int x){
+  int count = 0;
+  for (int i = 0; i < 32; i++) {
+    if (!((x >> i) & 1)) {
+      count++;
+      if (count == 2)
+        return 1 << i;
+    }
+  }
+  return 0;
 }
 int test_hdOverflow(int x,int y){
   long long res=(long long)x+(long long)y;
@@ -124,12 +132,12 @@ int test_signMask(void) {
   return 0x80000000;
 }
 
-int test_absVal(int x){
-  return x<0?-x:x;
+int test_negativePart(int x){
+  return x < 0 ? -x : 0;
 }
 
-int test_isLessOrEqual(int x, int y){
-  return x <= y;
+int test_isLargerOrEqual(int x, int y){
+  return x >= y;
 }
 
 int test_bitCount(int x) {
