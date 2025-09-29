@@ -144,7 +144,7 @@ NOTES:
  *   Rating: 1
  */
 int signMask(void) {
-  return 1;
+  return 1 << 31;
 }
 
 // P2
@@ -156,20 +156,24 @@ int signMask(void) {
  *   Rating: 2
  */
 int bitXor(int x, int y) {
-	return 2;
+	int notBothOne = ~(x & y);
+	int notBothZero = ~((~x) & (~y));
+	return notBothOne & notBothZero;
 }
 
 // P3
 /*
- * getByte - return the nth byte of x
+ * clearByte - return x with the nth byte cleared to 0
  *   You can assume 0 <= n <= 3
- *   Example: getByte(0x01020304, 2) = 0x2
+ *   Example: clearByte(0x01020304, 2) = 0x01000304
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 6
  *   Rating: 2
  */
-int getByte(int x,int n) {
-  return 3;
+int clearByte(int x,int n) {
+  int shift = n << 3;
+  int mask = ~(0xFF << shift);
+  return x & mask;
 }
 
 // P4
@@ -181,32 +185,43 @@ int getByte(int x,int n) {
  *   Rating: 3
  */
 int roundUp(int x) {
-  return 4;
+  int mask = 0xFF;
+  int hasRemainder = !!(x & mask);
+  int base = x & ~mask;
+  return base + (hasRemainder << 8);
 }
 
 // P5
 /*
- * absVal - return the absolute value of x
- *   Examples: absVal(-10) = 10
- *			       absVal(5) = 5
+ * negativePart - return -x if x < 0, otherwise return 0
+ *   Examples: negativePart(-10) = 10, negativePart(5) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 6
  *   Rating: 3
  */
-int absVal(int x){
-  return 5;
+int negativePart(int x){
+  int sign = x >> 31;
+  int negX = (~x + 1);
+  return negX & sign;
 }
 
 // P6
 /* 
- * isLessOrEqual - if x <= y  then return 1, else return 0 
- *   Example: isLessOrEqual(4,5) = 1.
+ * isLargerOrEqual - return 1 if x >= y, else return 0 
+ *   Example: isLargerOrEqual(5,4) = 1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 4
  */
-int isLessOrEqual(int x, int y) {
-  return 6;
+int isLargerOrEqual(int x, int y) {
+  int signX = (x >> 31) & 1;
+  int signY = (y >> 31) & 1;
+  int signDiff = signX ^ signY;
+  int diff = x + (~y + 1);
+  int diffSign = (diff >> 31) & 1;
+  int sameSignCmp = !diffSign;
+  int sameSign = !signDiff;
+  return (signDiff & signY) | (sameSign & sameSignCmp);
 }
 
 // P7
@@ -219,58 +234,73 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int logicalShift(int x, int n) {
-  return 7;
+  int mask=((0x1<<(32+~n))+~0)|(0x1<<(32+~n));
+  return (x>>n)&mask;
 }
 
 // P8
 /*
- * swapOddandEven - swap the odd bits and even bits in x
- *   Examples: swapOddandEven(0xAA) = 0x55
+ * swapNibblePairs - swap the low and high 4 bits within each byte of x
+ *   Examples: swapNibblePairs(0xAB) = 0xBA
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 4
  */
-int swapOddandEven(int x) {
-  return 8;
+int swapNibblePairs(int x) {
+  int lowMask = 0x0F0F0F0F;
+  int lowPart = (x & lowMask) << 4;
+  int highPart = ((x >> 4) & lowMask);
+  return lowPart | highPart;
 }
 
 // P9
 /*
- * secondLowBit - return a mask that marks the position of the second least significant 1 bit
- *   Examples: secondLowBit(0x00000110) = 0x00000100
- *			       secondLowBit(0xFEDC1a80) = 0x00000200
- *             secondLowBit(0)  = 0
+ * secondLowestZeroBit - return a mask that marks the position of the second least significant 0 bit
+ *   Examples: secondLowestZeroBit(0xFFFFFFFD) = 0x4, secondLowestZeroBit(0x7FFFFFFF) = 0
+ *             secondLowestZeroBit(-1) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
  *   Rating: 4
  */
-int secondLowBit(int x) {
-  return 9;
+int secondLowestZeroBit(int x) {
+  int firstZero = (~x) & (x + 1);
+  int filled = x | firstZero;
+  return (~filled) & (filled + 1);
 }
 
 // P10
 /* 
- * rotateNbits - rotate x to left by n bits
+ * rotateRightBits - rotate x to right by n bits
  *   you can assume n >= 0
- *   Examples: rotateNbits(0x12345678, 8) = 0x34567812
+ *   Examples: rotateRightBits(0x12345678, 8) = 0x78123456
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 5
  */
-int rotateNBits(int x, int n) {
-  return 10;
+int rotateRightBits(int x, int n) {
+  int mask = 31;
+  int shift = n & mask;
+  int negShift = (32 + (~shift + 1)) & mask;
+  int leftPart = x << negShift;
+  int rightShifted = x >> shift;
+  int logicalMask = ~(((1 << 31) >> shift) << 1);
+  int rightPart = rightShifted & logicalMask;
+  return leftPart | rightPart;
 }
 
 // P11
 /* 
- * fractions - return floor(x*7/16), for 0 <= x <= (1 << 28), x is an integer 
- *   Example: fractions(20) = 8
+ * fractions - return floor((x*5 + 8)/16) for 0 <= x <= (1 << 28), x is an integer 
+ *   Example: fractions(20) = 6
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
  *   Rating: 5
  */
 int fractions(int x) {
-  return 11;
+  int times4 = x << 2;
+  int times5 = times4 + x;
+  int biased = times5 + 8;
+  return biased >> 4;
 }
 
 
@@ -284,20 +314,33 @@ int fractions(int x) {
  *   Rating: 7 
  */
 int overflowCalc(int x, int y, int z) {
-  return 12;
+  int sum1 = x + y;
+  int sum2 = sum1 + z;
+  int carry1 = ((x & y) | ((x ^ y) & ~sum1)) >> 31 & 1;
+  int carry2 = ((sum1 & z) | ((sum1 ^ z) & ~sum2)) >> 31 & 1;
+  return carry1 + carry2;
 }
 
 // P13
 /* 
- * mul3 - return x*3, and if x*3 overflow, change the result to 
+ * mul5Sat - return x*5, and if x*5 overflow, change the result to 
  * INT_MAX(0x7fffffff) or INT_MIN(0x80000000) correspondingly
- *   Examples: mul3(1) = 0x3, mul3(0x7ffffff0) = 0x7fffffff
+ *   Examples: mul5Sat(1) = 0x5, mul5Sat(0x40000000) = 0x7fffffff
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 36
  *   Rating: 7
  */
-int mul3(int x) {
-  return 13;
+int mul5Sat(int x) {
+  int x2 = x << 2;
+  int sum = x2 + x;
+  int of_in_x2 = ((x ^ x2) >> 31);
+  int of_in_sum = ((x ^ sum) >> 31);
+  int overflow = of_in_x2 | of_in_sum;/*溢出为全1，没有溢出为0*/
+  int sign = x >> 31;
+  int INT_MIN = 1 << 31;
+  int INT_MAX = ~INT_MIN;
+  int of_value = (~sign & INT_MAX) | (sign & INT_MIN);
+  return (overflow & of_value) | (~overflow & sum);
 }
 
 // P14
@@ -313,7 +356,17 @@ int mul3(int x) {
  *   Rating: 3
  */
 unsigned float_abs(unsigned uf) {
-  return 14;
+  unsigned mask = ~(1 << 31);
+  unsigned abs_uf = uf & mask;   
+
+  unsigned exponent = (uf >> 23) & 0xFF;
+  unsigned fraction = uf & ((1 << 23) - 1);
+
+  if (exponent == 0xFF && fraction != 0) {
+    return uf;
+  } else {
+    return abs_uf;
+  }
 }
 
 // P15
@@ -329,7 +382,38 @@ unsigned float_abs(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_half(unsigned f) {
-  return 15;
+  unsigned sign = f & (1 << 31);
+  unsigned exp = (f >> 23) & 0xFF;
+  unsigned frac = f & ((1 << 23) - 1);
+  unsigned rounding;
+
+  if (exp == 0xFF) {
+      return f; // NaN 或 Infinity 返回自身
+  }
+
+  if (exp == 0 || exp == 1) {
+    // 非标准化数或指数为1的情况，需要处理尾数并考虑舍入
+    if (exp == 1) {
+        frac = frac | (1 << 23);
+    }
+
+    // 检查被移出的位以决定是否需要舍入
+    rounding = (frac & 3); // 取尾数的最低两位
+
+    frac = frac >> 1; // 尾数右移一位
+
+    if (rounding == 3) { // 11就加1
+        frac = frac + 1;
+    }
+
+    // 指数变为0（非标准化数）
+    exp = 0;
+
+    return sign | (exp << 23) | (frac & ((1 << 23) - 1));
+  } else {
+    exp = exp - 1;
+    return sign | (exp << 23) | frac;
+  }
 }
 
 // P16
@@ -343,7 +427,28 @@ unsigned float_half(unsigned f) {
  *   Rating: 7
  */
 unsigned float_i2f(int x) {
-  return 16;
+  int fx, exp, nx, wx;
+  unsigned ans, sign, tag;
+  if (!x) return x;
+  if (x == 1 << 31) return 0xcf << 24; 
+    sign = x >> 31;
+    wx = fx = (x ^ sign) + (~sign) + 1;
+    exp = 0;
+    while (wx){
+    exp++;
+    wx >>= 1;
+  }
+  exp--;
+  ans = (x & (1 << 31)) | ((exp + 127) << 23);
+  if (exp <= 23) ans = ans | (fx & (~(1 << exp))) << (23 - exp);
+  else{
+    nx = fx >> (exp - 24);
+    wx = (1 << (exp - 24)) - 1;
+    if (fx & wx) tag = (nx & 1) == 1;
+    else tag = (nx & 3) == 3; // 五成双
+    ans = (ans | (((nx >> 1) & (~(1 << 23))))) + tag; 
+  }
+  return ans;
 }
 
 
@@ -375,7 +480,12 @@ unsigned float_i2f(int x) {
  *   Rating: 2
  */
 int oddParity(int x) {
-  return 17;
+  x ^= (x >> 16);
+  x ^= (x >> 8);
+  x ^= (x >> 4);
+  x ^= (x >> 2);
+  x ^= (x >> 1);
+  return !(x & 1);
 }
 
 // P18
@@ -387,5 +497,21 @@ int oddParity(int x) {
  *   Rating: 2
  */
 int bitCount(int x) {
-  return 18;
+  int mask1, mask2, mask3, mask4, mask5;
+  mask1 = 0x55 | (0x55 << 8); 
+  mask1 = mask1 | (mask1 << 16);  
+  mask2 = 0x33 | (0x33 << 8);   
+  mask2 = mask2 | (mask2 << 16);  
+  mask3 = 0x0F | (0x0F << 8);  
+  mask3 = mask3 | (mask3 << 16); 
+  mask4 = 0xFF | (0xFF << 16);
+  mask5 = 0xFF | (0xFF << 8);      
+
+  x = (x & mask1) + ((x >> 1) & mask1);
+  x = (x & mask2) + ((x >> 2) & mask2);
+  x = (x & mask3) + ((x >> 4) & mask3);
+  x = (x & mask4) + ((x >> 8) & mask4);
+  x = (x & mask5) + ((x >> 16) & mask5);
+
+  return x;
 }

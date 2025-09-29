@@ -1,6 +1,6 @@
 # Lab1 -- DataLab
 
-> author: 伊凡，李增昊
+> author: 蔡亦扬
 
 ## 一、实验简介
 
@@ -10,7 +10,7 @@ CSAPP 第一章配套实验。
 
 本实验分为常规部和荣誉部分。荣誉部分的难度较高，是本课程比较有挑战性的部分。
 
-荣誉部分虽然占分，但是占分并不高，大家可以自己决定要不要做荣誉部分。Use your discretion！
+荣誉部分虽然占分，但是占分并不高，大家可以自己决定要不要做荣誉部分。生活就像海洋，只有意志坚强的人才能到达彼岸！
 
 
 
@@ -18,11 +18,11 @@ CSAPP 第一章配套实验。
 
 ### （1）下载
 
-从 `github classroom` 拉取`ICS2024_datalab` 文件夹，其中的内容就是本次实验用到的的文件了，拉取指令如下：
+从 `github classroom` 拉取`ICS2025_datalab` 文件夹，其中的内容就是本次实验用到的的文件了，拉取指令如下：
 
 ```shell
 git clone xxx  # 将 xxx 替换为对应链接
-cd ICS2024_datalab
+cd ICS2025_datalab
 ```
 
 ### （2）准备工作
@@ -214,9 +214,8 @@ git push
 ## 五、参考资料
 
 * http://csapp.cs.cmu.edu/3e/labs.html （lab 来源，本实验相较原文件有改动）
-
-* 本文档编写时参考了 22, 23 年的实验文档 。
-
+* 本文档编写时参考了 24 年的实验文档 。
 * 负责助教:
-  * 伊凡 21307130047@m.fudan.edu.cn
-  * 李增昊 22307130108@m.fudan.edu.cn
+  * 蔡亦扬 caiyy23@m.fudan.edu.cn
+
+**特别鸣谢**：24Fall ICS助教李增厚
