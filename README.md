@@ -1,6 +1,6 @@
 # Lab1 -- DataLab
 
-> author: 蔡亦扬
+> author: 蔡亦扬、项正豪
 
 ## 一、实验简介
 
@@ -217,5 +217,6 @@ git push
 * 本文档编写时参考了 24 年的实验文档 。
 * 负责助教:
   * 蔡亦扬 caiyy23@m.fudan.edu.cn
+  * 项正豪 zhxiang23@m.fudan.edu.cn
 
-**特别鸣谢**：24Fall ICS助教李增厚
+**特别鸣谢**：24Fall ICS助教李增昊
