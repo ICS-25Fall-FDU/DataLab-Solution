@@ -46,7 +46,7 @@ test_rec test_set[] = {
     "! ~ & ^ | + << >>", 8, 4,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"rotateNBits", (funct_t) rotateNBits, (funct_t) test_rotateNBits, 2, "! ~ & ^ | + << >>", 10, 5,
+ {"rotateRightBits", (funct_t) rotateRightBits, (funct_t) test_rotateRightBits, 2, "! ~ & ^ | + << >>", 10, 5,
   {{TMin, TMax},{0,TMax},{TMin,TMax}}},
 
  {"fractions", (funct_t) fractions, (funct_t) test_fractions, 1, "! ~ & ^ | + << >>", 8, 5,
@@ -56,7 +56,7 @@ test_rec test_set[] = {
     "! ~ & ^ | + << >>", 30, 7,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"mul3", (funct_t) mul3, (funct_t) test_mul3, 1,
+ {"mul5Sat", (funct_t) mul5Sat, (funct_t) test_mul5Sat, 1,
     "! ~ & ^ | + << >>", 30, 7,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 

@@ -270,27 +270,37 @@ int secondLowestZeroBit(int x) {
 
 // P10
 /* 
- * rotateNbits - rotate x to left by n bits
+ * rotateRightBits - rotate x to right by n bits
  *   you can assume n >= 0
- *   Examples: rotateNbits(0x12345678, 8) = 0x34567812
+ *   Examples: rotateRightBits(0x12345678, 8) = 0x78123456
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 5
  */
-int rotateNBits(int x, int n) {
-  return 10;
+int rotateRightBits(int x, int n) {
+  int mask = 31;
+  int shift = n & mask;
+  int negShift = (32 + (~shift + 1)) & mask;
+  int leftPart = x << negShift;
+  int rightShifted = x >> shift;
+  int logicalMask = ~(((1 << 31) >> shift) << 1);
+  int rightPart = rightShifted & logicalMask;
+  return leftPart | rightPart;
 }
 
 // P11
 /* 
- * fractions - return floor(x*7/16), for 0 <= x <= (1 << 28), x is an integer 
- *   Example: fractions(20) = 8
+ * fractions - return floor((x*5 + 8)/16) for 0 <= x <= (1 << 28), x is an integer 
+ *   Example: fractions(20) = 6
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
  *   Rating: 5
  */
 int fractions(int x) {
-  return 11;
+  int times4 = x << 2;
+  int times5 = times4 + x;
+  int biased = times5 + 8;
+  return biased >> 4;
 }
 
 
@@ -304,20 +314,33 @@ int fractions(int x) {
  *   Rating: 7 
  */
 int overflowCalc(int x, int y, int z) {
-  return 12;
+  int sum1 = x + y;
+  int sum2 = sum1 + z;
+  int carry1 = ((x & y) | ((x ^ y) & ~sum1)) >> 31 & 1;
+  int carry2 = ((sum1 & z) | ((sum1 ^ z) & ~sum2)) >> 31 & 1;
+  return carry1 + carry2;
 }
 
 // P13
 /* 
- * mul3 - return x*3, and if x*3 overflow, change the result to 
+ * mul5Sat - return x*5, and if x*5 overflow, change the result to 
  * INT_MAX(0x7fffffff) or INT_MIN(0x80000000) correspondingly
- *   Examples: mul3(1) = 0x3, mul3(0x7ffffff0) = 0x7fffffff
+ *   Examples: mul5Sat(1) = 0x5, mul5Sat(0x40000000) = 0x7fffffff
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 36
  *   Rating: 7
  */
-int mul3(int x) {
-  return 13;
+int mul5Sat(int x) {
+  int x2 = x << 2;
+  int sum = x2 + x;
+  int of_in_x2 = ((x ^ x2) >> 31);
+  int of_in_sum = ((x ^ sum) >> 31);
+  int overflow = of_in_x2 | of_in_sum;/*溢出为全1，没有溢出为0*/
+  int sign = x >> 31;
+  int INT_MIN = 1 << 31;
+  int INT_MAX = ~INT_MIN;
+  int of_value = (~sign & INT_MAX) | (sign & INT_MIN);
+  return (overflow & of_value) | (~overflow & sum);
 }
 
 // P14
@@ -333,7 +356,17 @@ int mul3(int x) {
  *   Rating: 3
  */
 unsigned float_abs(unsigned uf) {
-  return 14;
+  unsigned mask = ~(1 << 31);
+  unsigned abs_uf = uf & mask;   
+
+  unsigned exponent = (uf >> 23) & 0xFF;
+  unsigned fraction = uf & ((1 << 23) - 1);
+
+  if (exponent == 0xFF && fraction != 0) {
+    return uf;
+  } else {
+    return abs_uf;
+  }
 }
 
 // P15
@@ -349,7 +382,38 @@ unsigned float_abs(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_half(unsigned f) {
-  return 15;
+  unsigned sign = f & (1 << 31);
+  unsigned exp = (f >> 23) & 0xFF;
+  unsigned frac = f & ((1 << 23) - 1);
+  unsigned rounding;
+
+  if (exp == 0xFF) {
+      return f; // NaN 或 Infinity 返回自身
+  }
+
+  if (exp == 0 || exp == 1) {
+    // 非标准化数或指数为1的情况，需要处理尾数并考虑舍入
+    if (exp == 1) {
+        frac = frac | (1 << 23);
+    }
+
+    // 检查被移出的位以决定是否需要舍入
+    rounding = (frac & 3); // 取尾数的最低两位
+
+    frac = frac >> 1; // 尾数右移一位
+
+    if (rounding == 3) { // 11就加1
+        frac = frac + 1;
+    }
+
+    // 指数变为0（非标准化数）
+    exp = 0;
+
+    return sign | (exp << 23) | (frac & ((1 << 23) - 1));
+  } else {
+    exp = exp - 1;
+    return sign | (exp << 23) | frac;
+  }
 }
 
 // P16
@@ -363,7 +427,39 @@ unsigned float_half(unsigned f) {
  *   Rating: 7
  */
 unsigned float_i2f(int x) {
-  return 16;
+    unsigned sign = x & 0x80000000;
+    unsigned abs_x = x;
+    unsigned exp = 0;
+    unsigned frac = 0;
+    int shift = 0;
+
+    if (x == 0) {
+        return 0;
+    }
+    if (x < 0) {
+        abs_x = -x;
+    }
+
+    // exp的计算
+    while ((abs_x & 0x80000000) == 0) {
+        abs_x <<= 1;
+        shift++;
+    }
+    exp = 158 - shift;
+
+    // frac计算
+    frac = (abs_x & 0x7FFFFFFF) >> 8;
+
+    // 舍入处理
+    if ((abs_x & 0x80) && ((abs_x & 0x7F) || (frac & 1))) {
+        frac++;
+        if (frac >> 23) {
+            exp++;
+            frac = 0;
+        }
+    }
+
+    return sign | (exp << 23) | frac;
 }
 
 
@@ -395,7 +491,12 @@ unsigned float_i2f(int x) {
  *   Rating: 2
  */
 int oddParity(int x) {
-  return 17;
+  x ^= (x >> 16);
+  x ^= (x >> 8);
+  x ^= (x >> 4);
+  x ^= (x >> 2);
+  x ^= (x >> 1);
+  return !(x & 1);
 }
 
 // P18
@@ -407,5 +508,21 @@ int oddParity(int x) {
  *   Rating: 2
  */
 int bitCount(int x) {
-  return 18;
+  int mask1, mask2, mask3, mask4, mask5;
+  mask1 = 0x55 | (0x55 << 8); 
+  mask1 = mask1 | (mask1 << 16);  
+  mask2 = 0x33 | (0x33 << 8);   
+  mask2 = mask2 | (mask2 << 16);  
+  mask3 = 0x0F | (0x0F << 8);  
+  mask3 = mask3 | (mask3 << 16); 
+  mask4 = 0xFF | (0xFF << 16);
+  mask5 = 0xFF | (0xFF << 8);      
+
+  x = (x & mask1) + ((x >> 1) & mask1);
+  x = (x & mask2) + ((x >> 2) & mask2);
+  x = (x & mask3) + ((x >> 4) & mask3);
+  x = (x & mask4) + ((x >> 8) & mask4);
+  x = (x & mask5) + ((x >> 16) & mask5);
+
+  return x;
 }

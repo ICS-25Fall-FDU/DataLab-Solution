@@ -63,15 +63,16 @@ int test_swapNibblePairs(int x){
     return result;
 }
 
-int test_rotateNBits(int x, int n){
-  n = n%32;
-  int left_part = x<<n;
-  int right_part = (unsigned int)x>>(32 - n);
-  return (left_part|right_part);
+int test_rotateRightBits(int x, int n){
+  unsigned int ux = (unsigned int)x;
+  unsigned int shift = (unsigned int)n & 31;
+  unsigned int rightPart = ux >> shift;
+  unsigned int leftPart = ux << ((32 - shift) & 31);
+  return (int)(rightPart | leftPart);
 }
 
 int test_fractions(int x){
-  return x*7/16;
+  return (x*5 + 8)/16;
 }
 int test_secondLowestZeroBit(int x){
   int count = 0;
@@ -148,13 +149,13 @@ int test_bitCount(int x) {
   return result;
 }
 
-int test_mul3(int x){
-  if(x > 0x7fffffff/3)
+int test_mul5Sat(int x){
+  if(x > 0x7fffffff/5)
     return 0x7fffffff;
-  else if(x < (int)0x80000000/3)
+  else if(x < (int)0x80000000/5)
     return 0x80000000;
   else 
-    return x*3;
+    return x*5;
 }
 
 int test_logicalShift(int x, int n) {
