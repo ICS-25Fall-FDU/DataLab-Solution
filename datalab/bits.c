@@ -1,4 +1,3 @@
-#include <stdio.h>
 /* 
  * CS:APP Data Lab 
  * 
