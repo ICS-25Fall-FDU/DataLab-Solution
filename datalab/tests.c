@@ -116,12 +116,12 @@ int test_oddParity(int x){
   return answer%2?0:1;
 }
 
-int test_bitNor(int x, int y){
-  return ~(x|y);
+int test_bitXor(int x, int y){
+  return x ^ y;
 }
 
-int test_tmax(void) {
-  return 0x7fffffff;
+int test_signMask(void) {
+  return 0x80000000;
 }
 
 int test_absVal(int x){
