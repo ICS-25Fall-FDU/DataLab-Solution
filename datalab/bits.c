@@ -1,3 +1,4 @@
+#include <stdio.h>
 /* 
  * CS:APP Data Lab 
  * 
@@ -331,16 +332,15 @@ int overflowCalc(int x, int y, int z) {
  *   Rating: 7
  */
 int mul5Sat(int x) {
-  int x2 = x << 2;
-  int sum = x2 + x;
-  int of_in_x2 = ((x ^ x2) >> 31);
-  int of_in_sum = ((x ^ sum) >> 31);
-  int overflow = of_in_x2 | of_in_sum;/*溢出为全1，没有溢出为0*/
-  int sign = x >> 31;
-  int INT_MIN = 1 << 31;
-  int INT_MAX = ~INT_MIN;
-  int of_value = (~sign & INT_MAX) | (sign & INT_MIN);
-  return (overflow & of_value) | (~overflow & sum);
+  int c2 = 1 << 31;
+  int c1 = c2 + (~0);
+  int mark = x >> 31;
+  int absx = (x ^ mark) + (~mark) + 1;
+  int sign1 = (absx << 2) >> 31;
+  int sign2 = ((absx << 1) + absx) >> 31;
+  int sign3 = ((absx << 2) + absx) >> 31;
+  int sign4 = sign1 | sign2 | sign3;
+  return (sign4 & ((mark & c2) | ((~mark) & c1))) | (~sign4 & ((x << 2) + x));
 }
 
 // P14
