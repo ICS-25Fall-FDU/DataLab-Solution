@@ -138,24 +138,24 @@ NOTES:
 
 // P1
 /* 
- * tmax - return the biggest positive number that an integer can represent
+ * signMask - return a mask with only the most significant bit set (0x80000000)
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 2
  *   Rating: 1
  */
-int tmax(void) {
+int signMask(void) {
   return 1;
 }
 
 // P2
 /* 
- * bitNor - ~(x|y) using only ~ and & 
- *   Example: bitNor(4, 5) = -6, bitNor(-1,-2) = 0
+ * bitXor - x^y using only ~ and & 
+ *   Example: bitXor(4, 5) = 1, bitXor(7, 7) = 0
  *   Legal ops: ~ &
  *   Max ops: 8
  *   Rating: 2
  */
-int bitNor(int x, int y) {
+int bitXor(int x, int y) {
 	return 2;
 }
 

@@ -10,10 +10,10 @@
 
 test_rec test_set[] = {
 
- {"tmax", (funct_t) tmax, (funct_t) test_tmax, 0, "! ~ & ^ | + << >>", 2, 1,
+ {"signMask", (funct_t) signMask, (funct_t) test_signMask, 0, "! ~ & ^ | + << >>", 2, 1,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
- {"bitNor", (funct_t) bitNor, (funct_t) test_bitNor, 2, "& ~", 8, 2,
+ {"bitXor", (funct_t) bitXor, (funct_t) test_bitXor, 2, "& ~", 8, 2,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
  {"bitCount", (funct_t) bitCount, (funct_t) test_bitCount, 1, "! ~ & ^ | + << >>", 40, 2,
