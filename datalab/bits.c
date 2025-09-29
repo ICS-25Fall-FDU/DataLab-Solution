@@ -427,39 +427,28 @@ unsigned float_half(unsigned f) {
  *   Rating: 7
  */
 unsigned float_i2f(int x) {
-    unsigned sign = x & 0x80000000;
-    unsigned abs_x = x;
-    unsigned exp = 0;
-    unsigned frac = 0;
-    int shift = 0;
-
-    if (x == 0) {
-        return 0;
-    }
-    if (x < 0) {
-        abs_x = -x;
-    }
-
-    // exp的计算
-    while ((abs_x & 0x80000000) == 0) {
-        abs_x <<= 1;
-        shift++;
-    }
-    exp = 158 - shift;
-
-    // frac计算
-    frac = (abs_x & 0x7FFFFFFF) >> 8;
-
-    // 舍入处理
-    if ((abs_x & 0x80) && ((abs_x & 0x7F) || (frac & 1))) {
-        frac++;
-        if (frac >> 23) {
-            exp++;
-            frac = 0;
-        }
-    }
-
-    return sign | (exp << 23) | frac;
+ int fx, exp, nx, wx;
+ unsigned ans, sign, tag;
+ if (!x) return x;
+ if (x == 1 << 31) return 0xcf << 24; 
+ sign = x >> 31;
+ wx = fx = (x ^ sign) + (~sign) + 1;
+ exp = 0;
+ while (wx){
+  exp++;
+  wx >>= 1;
+ }
+ exp--;
+ ans = (x & (1 << 31)) | ((exp + 127) << 23);
+ if (exp <= 23) ans = ans | (fx & (~(1 << exp))) << (23 - exp);
+ else{
+  nx = fx >> (exp - 24);
+  wx = (1 << (exp - 24)) - 1;
+  if (fx & wx) tag = (nx & 1) == 1;  // 四舍六入
+  else tag = (nx & 3) == 3; // 五成双
+  ans = (ans | (((nx >> 1) & (~(1 << 23))))) + tag; 
+ }
+ return ans;
 }
 
 
