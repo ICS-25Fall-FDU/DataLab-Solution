@@ -163,36 +163,6 @@ int bitXor(int x, int y) {
 
 // P3
 /*
- * clearByte - return x with the nth byte cleared to 0
- *   You can assume 0 <= n <= 3
- *   Example: clearByte(0x01020304, 2) = 0x01000304
- *   Legal ops: ! ~ & ^ | + << >>
- *   Max ops: 6
- *   Rating: 2
- */
-int clearByte(int x,int n) {
-  int shift = n << 3;
-  int mask = ~(0xFF << shift);
-  return x & mask;
-}
-
-// P4
-/* 
- * roundUp - round up x to the nearest multiple of 256 that is bigger than x
- *   Example: roundUp(0x117f) = 0x1200
- *   Legal ops: ! ~ & ^ | + << >>
- *   Max ops: 8
- *   Rating: 3
- */
-int roundUp(int x) {
-  int mask = 0xFF;
-  int hasRemainder = !!(x & mask);
-  int base = x & ~mask;
-  return base + (hasRemainder << 8);
-}
-
-// P5
-/*
  * negativePart - return -x if x < 0, otherwise return 0
  *   Examples: negativePart(-10) = 10, negativePart(5) = 0
  *   Legal ops: ! ~ & ^ | + << >>
@@ -203,6 +173,37 @@ int negativePart(int x){
   int sign = x >> 31;
   int negX = (~x + 1);
   return negX & sign;
+}
+
+
+// P4
+/*
+ * clearByte - return x with the nth byte cleared to 0
+ *   You can assume 0 <= n <= 3
+ *   Example: clearByte(0x01020304, 2) = 0x01000304
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 6
+ *   Rating: 4
+ */
+int clearByte(int x,int n) {
+  int shift = n << 3;
+  int mask = ~(0xFF << shift);
+  return x & mask;
+}
+
+// P5
+/* 
+ * roundUp - round up x to the nearest multiple of 256 that is bigger than x
+ *   Example: roundUp(0x117f) = 0x1200
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 8
+ *   Rating: 4
+ */
+int roundUp(int x) {
+  int mask = 0xFF;
+  int hasRemainder = !!(x & mask);
+  int base = x & ~mask;
+  return base + (hasRemainder << 8);
 }
 
 // P6
@@ -244,7 +245,7 @@ int logicalShift(int x, int n) {
  *   Examples: swapNibblePairs(0xAB) = 0xBA
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
- *   Rating: 4
+ *   Rating: 5
  */
 int swapNibblePairs(int x) {
   int mask = 0x0F;                 // 合法常量
@@ -263,7 +264,7 @@ int swapNibblePairs(int x) {
  *             secondLowestZeroBit(-1) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
- *   Rating: 4
+ *   Rating: 5
  */
 int secondLowestZeroBit(int x) {
   int firstZero = (~x) & (x + 1);
@@ -347,6 +348,107 @@ int mul5Sat(int x) {
 
 // P14
 /* 
+ * float_half - Return bit-level equivalent of expression f/2 for
+ *   floating point argument f.
+ *   Both the argument and result are passed as unsigned int's, but
+ *   they are to be interpreted as the bit-level representation of
+ *   single-precision floating point values.
+ *   When argument is NaN, return argument
+ *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 32
+ *   Rating: 7
+ */
+unsigned float_half(unsigned f) {
+  unsigned sign = f & (1 << 31);
+  unsigned exp = (f >> 23) & 0xFF;
+  unsigned frac = f & ((1 << 23) - 1);
+  unsigned rounding;
+
+  if (exp == 0xFF) {
+      return f; // NaN 或 Infinity 返回自身
+  }
+
+  if (exp == 0 || exp == 1) {
+    // 非标准化数或指数为1的情况，需要处理尾数并考虑舍入
+    if (exp == 1) {
+        frac = frac | (1 << 23);
+    }
+
+    // 检查被移出的位以决定是否需要舍入
+    rounding = (frac & 3); // 取尾数的最低两位
+
+    frac = frac >> 1; // 尾数右移一位
+
+    if (rounding == 3) { // 11就加1
+        frac = frac + 1;
+    }
+
+    // 指数变为0（非标准化数）
+    exp = 0;
+
+    return sign | (exp << 23) | (frac & ((1 << 23) - 1));
+  } else {
+    exp = exp - 1;
+    return sign | (exp << 23) | frac;
+  }
+}
+
+// P15
+/* 
+ * float_i2f - Return bit-level equivalent of expression (float) x.
+ *   Result is returned as unsigned int, but
+ *   it is to be interpreted as the bit-level representation of a
+ *   single-precision floating point values.
+ *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 40
+ *   Rating: 7
+ */
+unsigned float_i2f(int x) {
+  int fx, exp, nx, wx;
+  unsigned ans, sign, tag;
+  if (!x) return x;
+  if (x == 1 << 31) return 0xcf << 24; 
+    sign = x >> 31;
+    wx = fx = (x ^ sign) + (~sign) + 1;
+    exp = 0;
+    while (wx){
+    exp++;
+    wx >>= 1;
+  }
+  exp--;
+  ans = (x & (1 << 31)) | ((exp + 127) << 23);
+  if (exp <= 23) ans = ans | (fx & (~(1 << exp))) << (23 - exp);
+  else{
+    nx = fx >> (exp - 24);
+    wx = (1 << (exp - 24)) - 1;
+    if (fx & wx) tag = (nx & 1) == 1;
+    else tag = (nx & 3) == 3; // 五成双
+    ans = (ans | (((nx >> 1) & (~(1 << 23))))) + tag; 
+  }
+  return ans;
+}
+
+
+#ifdef NOT_SUPPOSED_TO_BE_DEFINED
+#   __          __  _                          
+#   \ \        / / | |                         
+#    \ \  /\  / /__| | ___ ___  _ __ ___   ___ 
+#     \ \/  \/ / _ \ |/ __/ _ \| '_ ' _ \ / _ \
+#      \  /\  /  __/ | (_| (_) | | | | | |  __/       
+#       \/  \/ \___|_|\___\___/|_| |_| |_|\___|
+#                                              
+
+#  ██╗  ██╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗     ██████╗  █████╗ ██████╗ ████████╗
+#  ██║  ██║██╔═══██╗████╗  ██║██╔═══██╗██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝
+#  ███████║██║   ██║██╔██╗ ██║██║   ██║██████╔╝    ██████╔╝███████║██████╔╝   ██║   
+#  ██╔══██║██║   ██║██║╚██╗██║██║   ██║██╔══██╗    ██╔═══╝ ██╔══██║██╔══██╗   ██║   
+#  ██║  ██║╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║    ██║     ██║  ██║██║  ██║   ██║   
+#  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝    ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
+#                                                                                   
+#endif
+
+// P16
+/* 
  * float_inv - Return bit-level equivalent of expression 1/x (x is an integer) for
  *   Result is returned as unsigned int, but
  *   it is to be interpreted as the bit-level representation of a
@@ -354,7 +456,7 @@ int mul5Sat(int x) {
  *   When x is 0, return NaN.
  *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
  *   Max ops: 120
- *   Rating: 3
+ *   Rating: 10
  *   For mercy, x is between -16777216 and 16777216, meaning that you don't have
  *   to handle denormalized numbers.
  */
@@ -485,107 +587,6 @@ unsigned float_inv(int x) {
   return sign | (new_exp << 23) | result_mantissa;
 }
 
-// P15
-/* 
- * float_half - Return bit-level equivalent of expression f/2 for
- *   floating point argument f.
- *   Both the argument and result are passed as unsigned int's, but
- *   they are to be interpreted as the bit-level representation of
- *   single-precision floating point values.
- *   When argument is NaN, return argument
- *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
- *   Max ops: 32
- *   Rating: 4
- */
-unsigned float_half(unsigned f) {
-  unsigned sign = f & (1 << 31);
-  unsigned exp = (f >> 23) & 0xFF;
-  unsigned frac = f & ((1 << 23) - 1);
-  unsigned rounding;
-
-  if (exp == 0xFF) {
-      return f; // NaN 或 Infinity 返回自身
-  }
-
-  if (exp == 0 || exp == 1) {
-    // 非标准化数或指数为1的情况，需要处理尾数并考虑舍入
-    if (exp == 1) {
-        frac = frac | (1 << 23);
-    }
-
-    // 检查被移出的位以决定是否需要舍入
-    rounding = (frac & 3); // 取尾数的最低两位
-
-    frac = frac >> 1; // 尾数右移一位
-
-    if (rounding == 3) { // 11就加1
-        frac = frac + 1;
-    }
-
-    // 指数变为0（非标准化数）
-    exp = 0;
-
-    return sign | (exp << 23) | (frac & ((1 << 23) - 1));
-  } else {
-    exp = exp - 1;
-    return sign | (exp << 23) | frac;
-  }
-}
-
-// P16
-/* 
- * float_i2f - Return bit-level equivalent of expression (float) x.
- *   Result is returned as unsigned int, but
- *   it is to be interpreted as the bit-level representation of a
- *   single-precision floating point values.
- *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
- *   Max ops: 40
- *   Rating: 7
- */
-unsigned float_i2f(int x) {
-  int fx, exp, nx, wx;
-  unsigned ans, sign, tag;
-  if (!x) return x;
-  if (x == 1 << 31) return 0xcf << 24; 
-    sign = x >> 31;
-    wx = fx = (x ^ sign) + (~sign) + 1;
-    exp = 0;
-    while (wx){
-    exp++;
-    wx >>= 1;
-  }
-  exp--;
-  ans = (x & (1 << 31)) | ((exp + 127) << 23);
-  if (exp <= 23) ans = ans | (fx & (~(1 << exp))) << (23 - exp);
-  else{
-    nx = fx >> (exp - 24);
-    wx = (1 << (exp - 24)) - 1;
-    if (fx & wx) tag = (nx & 1) == 1;
-    else tag = (nx & 3) == 3; // 五成双
-    ans = (ans | (((nx >> 1) & (~(1 << 23))))) + tag; 
-  }
-  return ans;
-}
-
-
-#ifdef NOT_SUPPOSED_TO_BE_DEFINED
-#   __          __  _                          
-#   \ \        / / | |                         
-#    \ \  /\  / /__| | ___ ___  _ __ ___   ___ 
-#     \ \/  \/ / _ \ |/ __/ _ \| '_ ' _ \ / _ \
-#      \  /\  /  __/ | (_| (_) | | | | | |  __/       
-#       \/  \/ \___|_|\___\___/|_| |_| |_|\___|
-#                                              
-
-#  ██╗  ██╗ ██████╗ ███╗   ██╗ ██████╗ ██████╗     ██████╗  █████╗ ██████╗ ████████╗
-#  ██║  ██║██╔═══██╗████╗  ██║██╔═══██╗██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝
-#  ███████║██║   ██║██╔██╗ ██║██║   ██║██████╔╝    ██████╔╝███████║██████╔╝   ██║   
-#  ██╔══██║██║   ██║██║╚██╗██║██║   ██║██╔══██╗    ██╔═══╝ ██╔══██║██╔══██╗   ██║   
-#  ██║  ██║╚██████╔╝██║ ╚████║╚██████╔╝██║  ██║    ██║     ██║  ██║██║  ██║   ██║   
-#  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝    ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
-#                                                                                   
-#endif
-
 // P17
 /*
  * oddParity - return the odd parity bit of x, that is, 
@@ -593,7 +594,7 @@ unsigned float_i2f(int x) {
  *   Examples: oddParity(5) = 1, oddParity(7) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 56
- *   Rating: 2
+ *   Rating: 10
  */
 int oddParity(int x) {
   x ^= (x >> 16);
@@ -610,7 +611,7 @@ int oddParity(int x) {
  *   Examples: bitCount(5) = 2, bitCount(7) = 3
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 40
- *   Rating: 2
+ *   Rating: 10
  */
 int bitCount(int x) {
   int mask1, mask2, mask3, mask4, mask5;
@@ -638,8 +639,8 @@ int bitCount(int x) {
  *   Examples: bitReverse(0x80000004) = 0x20000001
  *             bitReverse(0x7FFFFFFF) = 0xFFFFFFFE
  *   Legal ops: ! ~ & ^ | + << >>
- *   Max ops: 56
- *   Rating: 2
+ *   Max ops: 34
+ *   Rating: 10
  */
 int bitReverse(int x)
 {
