@@ -149,6 +149,16 @@ int test_bitCount(int x) {
   return result;
 }
 
+int test_bitReverse(int x){
+  int ans=0;
+  for(int i=0;i<32;i++){
+    ans<<=1;
+    ans|=(x&1);
+    x>>=1;
+  }
+  return ans;
+}
+
 int test_mul5Sat(int x){
   if(x > 0x7fffffff/5)
     return 0x7fffffff;

@@ -14,6 +14,7 @@ int bitXor(int x, int y);
 int negativePart(int x);
 int isLargerOrEqual(int x, int y);
 int bitCount(int x);
+int bitReverse(int x);
 int logicalShift(int x, int n);
 unsigned float_half(unsigned uf);
 
@@ -34,6 +35,7 @@ int test_signMask(void);
 int test_negativePart(int x);
 int test_isLargerOrEqual(int x, int y);
 int test_bitCount(int x);
+int test_bitReverse(int x);
 int test_logicalShift(int x, int n);
 unsigned test_float_half(unsigned uf);
 int test_mul5Sat(int x);

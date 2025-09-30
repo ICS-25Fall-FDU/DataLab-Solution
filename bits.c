@@ -517,3 +517,27 @@ int bitCount(int x) {
 
   return x;
 }
+
+// P19
+/*
+ * bitReverse - Reverse bits in an 32-bit integer
+ *   Examples: bitReverse(0x80000004) = 0x20000001
+ *             bitReverse(0x7FFFFFFF) = 0xFFFFFFFE
+ *   Legal ops: ! ~ & ^ | + << >>
+ *   Max ops: 56
+ *   Rating: 2
+ */
+int bitReverse(int x)
+{
+  int m1 = 255 + (255 << 8);
+  int m2 = m1 ^ (m1 << 8);
+  int m3 = m2 ^ (m2 << 4);
+  int m4 = m3 ^ (m3 << 2);
+  int m5 = m4 ^ (m4 << 1);
+  x = ((x >> 16) & m1) + (x << 16);
+  x = ((x & m2) << 8) + ((x >> 8) & m2);
+  x = ((x & m3) << 4) + ((x >> 4) & m3);
+  x = ((x & m4) << 2) + ((x >> 2) & m4);
+  x = ((x & m5) << 1) + ((x >> 1) & m5);
+  return x;
+}

@@ -74,6 +74,8 @@ test_rec test_set[] = {
  {"oddParity", (funct_t) oddParity, (funct_t) test_oddParity, 1, "! ~ & ^ | + << >>", 56, 2,
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
+ {"bitReverse", (funct_t) bitReverse, (funct_t) test_bitReverse, 1, "! ~ & ^ | + << >>", 56, 2,
+   {{1, TMax},{TMin,TMax},{TMin,TMax}}},
 
   {"", NULL, NULL, 0, "", 0, 0,
    {{0, 0},{0,0},{0,0}}}

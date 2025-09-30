@@ -260,6 +260,19 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 2
+    - name: bitReverse
+      id: bitreverse
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: bitReverse
+        setup-command: sudo apt-get install gcc-multilib && make clean
+          && make all
+        command: ./btest -f bitReverse
+        input: ''
+        expected-output: 'Total points: 2/2'
+        comparison-method: contains
+        timeout: 10
+        max-score: 2
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
@@ -282,5 +295,6 @@ jobs:
         FLOAT_I2F_RESULTS: "${{steps.float_i2f.outputs.result}}"
         ODDPARITY_RESULTS: "${{steps.oddparity.outputs.result}}"
         BITCOUNT_RESULTS: "${{steps.bitcount.outputs.result}}"
+        BITREVERSE_RESULTS: "${{steps.bitreverse.outputs.result}}"
       with:
-        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_abs,float_half,float_i2f,oddparity,bitcount
+        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_abs,float_half,float_i2f,oddparity,bitcount,bitreverse
