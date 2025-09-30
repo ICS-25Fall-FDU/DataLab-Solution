@@ -1,5 +1,3 @@
-
-cd datalab/
 make clean && make all > /dev/null
 
 if [ $? -eq 0 ]; then
