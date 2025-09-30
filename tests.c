@@ -103,12 +103,8 @@ int test_overflowCalc(int x, int y, int z){
   return res>>32;
 }
 
-unsigned test_float_abs(unsigned uf) {
-  float f = u2f(uf);
-  if (isnan(f))
-    return uf;
-  if(f==0&&uf>>31)return 0;
-  return f<0?f2u(-f):uf;
+unsigned test_float_inv(int x) {
+  return f2u(1.0/x);
 }
 
 unsigned test_float_i2f(int x) {

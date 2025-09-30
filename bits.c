@@ -346,7 +346,21 @@ int mul5Sat(int x) {
 }
 
 // P14
-// TODO HERE
+/* 
+ * float_inv - Return bit-level equivalent of expression 1/x (x is an integer) for
+ *   Result is returned as unsigned int, but
+ *   it is to be interpreted as the bit-level representation of a
+ *   single-precision floating point values.
+ *   When x is 0, return NaN.
+ *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
+ *   Max ops: 120
+ *   Rating: 3
+ *   For mercy, x is between -16777216 and 16777216, meaning that you don't have
+ *   to handle denormalized numbers.
+ */
+unsigned float_inv(int x) {
+  return 0;
+}
 
 // P15
 /* 
