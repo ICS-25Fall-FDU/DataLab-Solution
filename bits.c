@@ -259,7 +259,7 @@ int swapNibblePairs(int x) {
 // P9
 /*
  * secondLowestZeroBit - return a mask that marks the position of the second least significant 0 bit
- *   Examples: secondLowestZeroBit(0xFFFFFFFD) = 0x4, secondLowestZeroBit(0x7FFFFFFF) = 0
+ *   Examples: secondLowestZeroBit(0xFFFFFFFC) = 0x4, secondLowestZeroBit(0x7FFFFFFF) = 0
  *             secondLowestZeroBit(-1) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
