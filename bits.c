@@ -346,30 +346,7 @@ int mul5Sat(int x) {
 }
 
 // P14
-/* 
- * float_abs - Return bit-level equivalent of expression |f| (absolute value of f) for
- *   floating point argument f.
- *   Both the argument and result are passed as unsigned int's, but
- *   they are to be interpreted as the bit-level representations of
- *   single-precision floating point values.
- *   When argument is NaN, return argument.
- *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
- *   Max ops: 20
- *   Rating: 3
- */
-unsigned float_abs(unsigned uf) {
-  unsigned mask = ~(1 << 31);
-  unsigned abs_uf = uf & mask;   
-
-  unsigned exponent = (uf >> 23) & 0xFF;
-  unsigned fraction = uf & ((1 << 23) - 1);
-
-  if (exponent == 0xFF && fraction != 0) {
-    return uf;
-  } else {
-    return abs_uf;
-  }
-}
+// TODO HERE
 
 // P15
 /* 
