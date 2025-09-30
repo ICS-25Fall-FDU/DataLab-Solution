@@ -259,7 +259,7 @@ int swapNibblePairs(int x) {
 // P9
 /*
  * secondLowestZeroBit - return a mask that marks the position of the second least significant 0 bit
- *   Examples: secondLowestZeroBit(0xFFFFFFFD) = 0x4, secondLowestZeroBit(0x7FFFFFFF) = 0
+ *   Examples: secondLowestZeroBit(0xFFFFFFFC) = 0x4, secondLowestZeroBit(0x7FFFFFFF) = 0
  *             secondLowestZeroBit(-1) = 0
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 8
@@ -347,28 +347,142 @@ int mul5Sat(int x) {
 
 // P14
 /* 
- * float_abs - Return bit-level equivalent of expression |f| (absolute value of f) for
- *   floating point argument f.
- *   Both the argument and result are passed as unsigned int's, but
- *   they are to be interpreted as the bit-level representations of
+ * float_inv - Return bit-level equivalent of expression 1/x (x is an integer) for
+ *   Result is returned as unsigned int, but
+ *   it is to be interpreted as the bit-level representation of a
  *   single-precision floating point values.
- *   When argument is NaN, return argument.
+ *   When x is 0, return NaN.
  *   Legal ops: Any integer / unsigned operations incl. ||, &&. also if, while
- *   Max ops: 20
+ *   Max ops: 120
  *   Rating: 3
+ *   For mercy, x is between -16777216 and 16777216, meaning that you don't have
+ *   to handle denormalized numbers.
  */
-unsigned float_abs(unsigned uf) {
-  unsigned mask = ~(1 << 31);
-  unsigned abs_uf = uf & mask;   
+unsigned float_inv(int x) {
+  
+  unsigned sign = 0;
+  unsigned result_mantissa;
+  int exp = 0;
+  unsigned temp;
+  unsigned x_mantissa = 0;
+  int new_exp;
+  unsigned denominator;
+  unsigned quotient_high;
+  unsigned quotient_low;
+  unsigned remainder;
+  unsigned final_quotient;
+  int i;
 
-  unsigned exponent = (uf >> 23) & 0xFF;
-  unsigned fraction = uf & ((1 << 23) - 1);
-
-  if (exponent == 0xFF && fraction != 0) {
-    return uf;
-  } else {
-    return abs_uf;
+  // Handle x = 0 case - return positive infinity
+  if (x == 0) {
+    return 0x7F800000; // +infinity: exp = 0xFF, mantissa = 0
   }
+  
+  // Handle special cases first
+  if (x == 1) return 0x3F800000;  // 1.0
+  if (x == -1) return 0xBF800000; // -1.0
+  if (x == 2) return 0x3F000000;  // 0.5
+  if (x == -2) return 0xBF000000; // -0.5
+  
+  // Extract sign
+  if (x < 0) {
+    sign = 0x80000000;
+    if (x == 0x80000000) {
+      // Special case: x = -2^31
+      return sign | (95 << 23); // exp = 127 - 32 = 95
+    }
+    x = -x; // Make x positive
+  }
+  
+  // Convert x to float first using the float_i2f approach
+  // Find the number of bits needed to represent x
+
+  temp = x;
+  while (temp) {
+    temp >>= 1;
+    exp++;
+  }
+  exp--; // Adjust for 0-based indexing
+  
+  // Extract mantissa for x in float format
+
+  if (exp <= 23) {
+    x_mantissa = (x & ((1U << exp) - 1)) << (23 - exp);
+  } else {
+    x_mantissa = (x & ((1U << exp) - 1)) >> (exp - 23);
+    // Handle rounding here if needed
+  }
+  
+  // Now x in float format has:
+  // exponent: 127 + exp
+  // mantissa: x_mantissa
+  
+  // For 1/x:
+  // If x is a power of 2 (mantissa = 0), then 1/x is also a power of 2
+  // Otherwise, 1/(1.m * 2^e) = (1/1.m) * 2^(-e) and 1/1.m is in [0.5, 1)
+
+  if (x_mantissa == 0) {
+    // x is a power of 2, so 1/x = 2^(-exp)
+    new_exp = 127 - exp;
+  } else {
+    // Need normalization: exponent becomes 127 + (-exp - 1) = 126 - exp
+    new_exp = 126 - exp;
+  }
+  
+  // Handle underflow/overflow
+  if (new_exp <= 0) return sign; // underflow to zero
+  if (new_exp >= 255) return sign | 0x7F800000; // overflow to infinity
+  
+
+  if (x_mantissa == 0) {
+    // x is a power of 2, so 1/x is also a power of 2 with mantissa = 0
+    result_mantissa = 0;
+  } else {
+    // For the new mantissa, we need to compute 2 * (1/(1 + x_mantissa/2^23)) - 1
+    // This gives us the fractional part when the result is normalized to [1,2)
+    
+    // Manual 64-bit division: numerator = 2^47, denominator = 2^23 + x_mantissa
+    // We'll compute this as: (2^47) / (2^23 + x_mantissa)
+    
+    denominator = (1U << 23) + x_mantissa;
+    
+    // numerator = 2^47 = 0x800000000000 (high=0x8000, low=0x00000000)
+    // We'll do long division bit by bit
+    quotient_high = 0;
+    quotient_low = 0;
+    remainder = 0;
+    
+    // Start with the high bit of numerator (bit 47)
+    // Since numerator = 2^47, only bit 47 is set, so we start there
+    
+    for (i = 47; i >= 0; i--) {
+      remainder <<= 1;
+      if (i == 47) remainder |= 1; // Only bit 47 is set in numerator
+      
+      if (remainder >= denominator) {
+        remainder -= denominator;
+        if (i >= 32) {
+          quotient_high |= (1U << (i - 32));
+        } else {
+          quotient_low |= (1U << i);
+        }
+      }
+    }
+    
+    // Handle rounding: if remainder >= denominator/2, round up
+    if (remainder * 2 >= denominator) {
+      quotient_low++;
+      if (quotient_low == 0) quotient_high++; // Handle carry
+    }
+    
+    // The quotient represents 2^24 * (1/(1 + x_mantissa/2^23))
+    // Subtract 2^24 to get the fractional part
+    // 2^24 = 0x01000000, so we subtract from quotient_low
+    final_quotient = quotient_low - (1U << 24);
+    result_mantissa = final_quotient & 0x7FFFFF;
+  }
+  
+  return sign | (new_exp << 23) | result_mantissa;
 }
 
 // P15
