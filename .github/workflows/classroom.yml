@@ -195,14 +195,14 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 7
-    - name: float_abs
-      id: float_abs
+    - name: float_inv
+      id: float_inv
       uses: classroom-resources/autograding-io-grader@v1
       with:
-        test-name: float_abs
+        test-name: float_inv
         setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: ./btest -f float_abs
+        command: ./btest -f float_inv
         input: ''
         expected-output: 'Total points: 3/3'
         comparison-method: contains
@@ -277,10 +277,10 @@ jobs:
         FRACTIONS_RESULTS: "${{steps.fractions.outputs.result}}"
         OVERFLOWCALC_RESULTS: "${{steps.overflowcalc.outputs.result}}"
         MUL5SAT_RESULTS: "${{steps.mul5sat.outputs.result}}"
-        FLOAT_ABS_RESULTS: "${{steps.float_abs.outputs.result}}"
+        FLOAT_INV_RESULTS: "${{steps.float_inv.outputs.result}}"
         FLOAT_HALF_RESULTS: "${{steps.float_half.outputs.result}}"
         FLOAT_I2F_RESULTS: "${{steps.float_i2f.outputs.result}}"
         ODDPARITY_RESULTS: "${{steps.oddparity.outputs.result}}"
         BITCOUNT_RESULTS: "${{steps.bitcount.outputs.result}}"
       with:
-        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_abs,float_half,float_i2f,oddparity,bitcount
+        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_inv,float_half,float_i2f,oddparity,bitcount
