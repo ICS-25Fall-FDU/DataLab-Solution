@@ -61,7 +61,7 @@ test_rec test_set[] = {
   {{TMin, TMax},{TMin,TMax},{TMin,TMax}}},
 
 //float
- {"float_abs", (funct_t) float_inv, (funct_t) test_float_inv, 1,
+ {"float_inv", (funct_t) float_inv, (funct_t) test_float_inv, 1,
     "$", 120, 3,
      {{-16777216, 16777216},{1,1},{1,1}}},
  {"float_i2f", (funct_t) float_i2f, (funct_t) test_float_i2f, 1,

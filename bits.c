@@ -359,9 +359,20 @@ int mul5Sat(int x) {
  *   to handle denormalized numbers.
  */
 unsigned float_inv(int x) {
-  // x is an integer!
-  // return a unsigned(but interpreted as a float)
   
+  unsigned sign = 0;
+  unsigned result_mantissa;
+  int exp = 0;
+  unsigned temp;
+  unsigned x_mantissa = 0;
+  int new_exp;
+  unsigned denominator;
+  unsigned quotient_high;
+  unsigned quotient_low;
+  unsigned remainder;
+  unsigned final_quotient;
+  int i;
+
   // Handle x = 0 case - return positive infinity
   if (x == 0) {
     return 0x7F800000; // +infinity: exp = 0xFF, mantissa = 0
@@ -374,7 +385,6 @@ unsigned float_inv(int x) {
   if (x == -2) return 0xBF000000; // -0.5
   
   // Extract sign
-  unsigned sign = 0;
   if (x < 0) {
     sign = 0x80000000;
     if (x == 0x80000000) {
@@ -386,8 +396,8 @@ unsigned float_inv(int x) {
   
   // Convert x to float first using the float_i2f approach
   // Find the number of bits needed to represent x
-  int exp = 0;
-  unsigned temp = x;
+
+  temp = x;
   while (temp) {
     temp >>= 1;
     exp++;
@@ -395,7 +405,7 @@ unsigned float_inv(int x) {
   exp--; // Adjust for 0-based indexing
   
   // Extract mantissa for x in float format
-  unsigned x_mantissa = 0;
+
   if (exp <= 23) {
     x_mantissa = (x & ((1U << exp) - 1)) << (23 - exp);
   } else {
@@ -410,7 +420,7 @@ unsigned float_inv(int x) {
   // For 1/x:
   // If x is a power of 2 (mantissa = 0), then 1/x is also a power of 2
   // Otherwise, 1/(1.m * 2^e) = (1/1.m) * 2^(-e) and 1/1.m is in [0.5, 1)
-  int new_exp;
+
   if (x_mantissa == 0) {
     // x is a power of 2, so 1/x = 2^(-exp)
     new_exp = 127 - exp;
@@ -423,26 +433,53 @@ unsigned float_inv(int x) {
   if (new_exp <= 0) return sign; // underflow to zero
   if (new_exp >= 255) return sign | 0x7F800000; // overflow to infinity
   
-  unsigned result_mantissa;
+
   if (x_mantissa == 0) {
     // x is a power of 2, so 1/x is also a power of 2 with mantissa = 0
     result_mantissa = 0;
   } else {
     // For the new mantissa, we need to compute 2 * (1/(1 + x_mantissa/2^23)) - 1
     // This gives us the fractional part when the result is normalized to [1,2)
-    unsigned long long numerator = (1ULL << 47); // 2^47 (multiply by 2)
-    unsigned long long denominator = (1ULL << 23) + x_mantissa;
-    unsigned long long quotient = numerator / denominator;
-    unsigned long long remainder = numerator % denominator;
+    
+    // Manual 64-bit division: numerator = 2^47, denominator = 2^23 + x_mantissa
+    // We'll compute this as: (2^47) / (2^23 + x_mantissa)
+    
+    denominator = (1U << 23) + x_mantissa;
+    
+    // numerator = 2^47 = 0x800000000000 (high=0x8000, low=0x00000000)
+    // We'll do long division bit by bit
+    quotient_high = 0;
+    quotient_low = 0;
+    remainder = 0;
+    
+    // Start with the high bit of numerator (bit 47)
+    // Since numerator = 2^47, only bit 47 is set, so we start there
+    
+    for (i = 47; i >= 0; i--) {
+      remainder <<= 1;
+      if (i == 47) remainder |= 1; // Only bit 47 is set in numerator
+      
+      if (remainder >= denominator) {
+        remainder -= denominator;
+        if (i >= 32) {
+          quotient_high |= (1U << (i - 32));
+        } else {
+          quotient_low |= (1U << i);
+        }
+      }
+    }
     
     // Handle rounding: if remainder >= denominator/2, round up
     if (remainder * 2 >= denominator) {
-      quotient++;
+      quotient_low++;
+      if (quotient_low == 0) quotient_high++; // Handle carry
     }
     
     // The quotient represents 2^24 * (1/(1 + x_mantissa/2^23))
     // Subtract 2^24 to get the fractional part
-    result_mantissa = (quotient - (1ULL << 24)) & 0x7FFFFF;
+    // 2^24 = 0x01000000, so we subtract from quotient_low
+    final_quotient = quotient_low - (1U << 24);
+    result_mantissa = final_quotient & 0x7FFFFF;
   }
   
   return sign | (new_exp << 23) | result_mantissa;

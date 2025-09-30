@@ -283,4 +283,4 @@ jobs:
         ODDPARITY_RESULTS: "${{steps.oddparity.outputs.result}}"
         BITCOUNT_RESULTS: "${{steps.bitcount.outputs.result}}"
       with:
-        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_abs,float_half,float_i2f,oddparity,bitcount
+        runners: operator-check,signmask,bitxor,clearbyte,roundup,negativepart,islargerorequal,logicalshift,swapnibblepairs,secondlowestzerobit,rotaterightbits,fractions,overflowcalc,mul5sat,float_inv,float_half,float_i2f,oddparity,bitcount
