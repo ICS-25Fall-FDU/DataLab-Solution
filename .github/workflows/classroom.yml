@@ -18,9 +18,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: Operator Check
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && chmod +x dlc && ./dlc bits.c
+        command: chmod +x dlc && ./dlc bits.c
         input: ''
         expected-output: '^$'
         comparison-method: regex
@@ -31,9 +31,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: signMask
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f signMask
+        command: ./btest -f signMask
         input: ''
         expected-output: 'Total points: 1/1'
         comparison-method: contains
@@ -44,9 +44,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: bitXor
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f bitXor
+        command: ./btest -f bitXor
         input: ''
         expected-output: 'Total points: 2/2'
         comparison-method: contains
@@ -57,9 +57,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: clearByte
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f clearByte
+        command: ./btest -f clearByte
         input: ''
         expected-output: 'Total points: 2/2'
         comparison-method: contains
@@ -70,9 +70,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: roundUp
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f roundUp
+        command: ./btest -f roundUp
         input: ''
         expected-output: 'Total points: 3/3'
         comparison-method: contains
@@ -83,9 +83,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: negativePart
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f negativePart
+        command: ./btest -f negativePart
         input: ''
         expected-output: 'Total points: 3/3'
         comparison-method: contains
@@ -96,9 +96,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: isLargerOrEqual
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f isLargerOrEqual
+        command: ./btest -f isLargerOrEqual
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
@@ -109,9 +109,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: logicalShift
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f logicalShift
+        command: ./btest -f logicalShift
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
@@ -122,9 +122,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: swapNibblePairs
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f swapNibblePairs
+        command: ./btest -f swapNibblePairs
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
@@ -135,9 +135,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: secondLowestZeroBit
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f secondLowestZeroBit
+        command: ./btest -f secondLowestZeroBit
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
@@ -148,9 +148,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: rotateRightBits
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f rotateRightBits
+        command: ./btest -f rotateRightBits
         input: ''
         expected-output: 'Total points: 5/5'
         comparison-method: contains
@@ -161,9 +161,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: fractions
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f fractions
+        command: ./btest -f fractions
         input: ''
         expected-output: 'Total points: 5/5'
         comparison-method: contains
@@ -174,9 +174,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: overflowCalc
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f overflowCalc
+        command: ./btest -f overflowCalc
         input: ''
         expected-output: 'Total points: 7/7'
         comparison-method: contains
@@ -187,9 +187,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: mul5Sat
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f mul5Sat
+        command: ./btest -f mul5Sat
         input: ''
         expected-output: 'Total points: 7/7'
         comparison-method: contains
@@ -200,9 +200,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: float_abs
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f float_abs
+        command: ./btest -f float_abs
         input: ''
         expected-output: 'Total points: 3/3'
         comparison-method: contains
@@ -213,9 +213,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: float_half
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f float_half
+        command: ./btest -f float_half
         input: ''
         expected-output: 'Total points: 4/4'
         comparison-method: contains
@@ -226,9 +226,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: float_i2f
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f float_i2f
+        command: ./btest -f float_i2f
         input: ''
         expected-output: 'Total points: 7/7'
         comparison-method: contains
@@ -239,9 +239,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: oddParity
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f oddParity
+        command: ./btest -f oddParity
         input: ''
         expected-output: 'Total points: 2/2'
         comparison-method: contains
@@ -252,9 +252,9 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: bitCount
-        setup-command: sudo apt-get install gcc-multilib && cd datalab && make clean
+        setup-command: sudo apt-get install gcc-multilib && make clean
           && make all
-        command: cd datalab && ./btest -f bitCount
+        command: ./btest -f bitCount
         input: ''
         expected-output: 'Total points: 2/2'
         comparison-method: contains
